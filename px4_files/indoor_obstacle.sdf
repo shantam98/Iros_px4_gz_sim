@@ -1,0 +1,166 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="indoor_obstacles">
+
+    <physics type="ode">
+      <real_time_update_rate>1000.0</real_time_update_rate>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+    </physics>
+
+    <plugin filename="gz-sim-physics-system"       name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-sensors-system"        name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-user-commands-system"  name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-imu-system"            name="gz::sim::systems::Imu"/>
+    <plugin filename="gz-sim-magnetometer-system"   name="gz::sim::systems::Magnetometer"/>
+    <plugin filename="gz-sim-air-pressure-system"   name="gz::sim::systems::AirPressure"/>
+    <plugin filename="gz-sim-navsat-system"         name="gz::sim::systems::NavSat"/>
+
+    <!-- Lighting -->
+    <light name="ceiling_light_1" type="point">
+      <pose>0 0 4.8 0 0 0</pose>
+      <diffuse>1.0 1.0 1.0 1</diffuse>
+      <specular>0.3 0.3 0.3 1</specular>
+      <attenuation><range>20</range><constant>0.4</constant><linear>0.01</linear><quadratic>0.001</quadratic></attenuation>
+    </light>
+    <light name="ceiling_light_2" type="point">
+      <pose>5 5 4.8 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation><range>15</range><constant>0.4</constant><linear>0.01</linear><quadratic>0.001</quadratic></attenuation>
+    </light>
+    <light name="ceiling_light_3" type="point">
+      <pose>-5 -5 4.8 0 0 0</pose>
+      <diffuse>0.9 0.9 0.9 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation><range>15</range><constant>0.4</constant><linear>0.01</linear><quadratic>0.001</quadratic></attenuation>
+    </light>
+
+    <!-- ── Floor ── -->
+    <model name="floor"><static>true</static><pose>0 0 0 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>20 20 0.05</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>20 20 0.05</size></box></geometry>
+          <material><ambient>0.6 0.6 0.6 1</ambient><diffuse>0.7 0.7 0.7 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ── Ceiling ── -->
+    <model name="ceiling"><static>true</static><pose>0 0 5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>20 20 0.05</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>20 20 0.05</size></box></geometry>
+          <material><ambient>0.9 0.9 0.9 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ── Walls ── -->
+    <model name="wall_north"><static>true</static><pose>10 0 2.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.2 20 5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 20 5</size></box></geometry><material><ambient>0.8 0.8 0.8 1</ambient></material></visual>
+      </link>
+    </model>
+    <model name="wall_south"><static>true</static><pose>-10 0 2.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.2 20 5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 20 5</size></box></geometry><material><ambient>0.8 0.8 0.8 1</ambient></material></visual>
+      </link>
+    </model>
+    <model name="wall_east"><static>true</static><pose>0 10 2.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>20 0.2 5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>20 0.2 5</size></box></geometry><material><ambient>0.8 0.8 0.8 1</ambient></material></visual>
+      </link>
+    </model>
+    <model name="wall_west"><static>true</static><pose>0 -10 2.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>20 0.2 5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>20 0.2 5</size></box></geometry><material><ambient>0.8 0.8 0.8 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <!-- ── Interior divider with doorway gap ── -->
+    <model name="divider_a"><static>true</static><pose>3 -4 2.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.2 12 5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 12 5</size></box></geometry><material><ambient>0.6 0.6 0.75 1</ambient></material></visual>
+      </link>
+    </model>
+    <model name="divider_b"><static>true</static><pose>3 7 2.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.2 6 5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 6 5</size></box></geometry><material><ambient>0.6 0.6 0.75 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <!-- ═══════════════════════════════════════════
+         OBSTACLES — varied heights for sensor testing
+    ═══════════════════════════════════════════ -->
+
+    <!-- Red box — ground level -->
+    <model name="box_red"><static>true</static><pose>-4 -4 0.75 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>1.0 1.0 1.5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.0 1.0 1.5</size></box></geometry><material><ambient>0.8 0.1 0.1 1</ambient><diffuse>0.8 0.1 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Green box — ground level -->
+    <model name="box_green"><static>true</static><pose>-5 3 0.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>1.5 1.0 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.5 1.0 1.0</size></box></geometry><material><ambient>0.1 0.8 0.1 1</ambient><diffuse>0.1 0.8 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Yellow pillar — full height, tests horizontal ToF sensors -->
+    <model name="pillar_1"><static>true</static><pose>-2 1 2.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><cylinder><radius>0.3</radius><length>5.0</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.3</radius><length>5.0</length></cylinder></geometry><material><ambient>0.8 0.8 0.1 1</ambient><diffuse>0.8 0.8 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="pillar_2"><static>true</static><pose>6 -5 2.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><cylinder><radius>0.3</radius><length>5.0</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.3</radius><length>5.0</length></cylinder></geometry><material><ambient>0.8 0.8 0.1 1</ambient><diffuse>0.8 0.8 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Blue wall panel — at flight height (2m), tests front RGBD + ToF -->
+    <model name="wall_panel_blue"><static>true</static><pose>-6 0 2.0 0 0 0.785</pose>
+      <link name="link"><collision name="c"><geometry><box><size>2.0 0.2 1.5</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.0 0.2 1.5</size></box></geometry><material><ambient>0.1 0.1 0.9 1</ambient><diffuse>0.1 0.1 0.9 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Brown platform — tests bottom depth camera -->
+    <model name="platform"><static>true</static><pose>2 -7 0.3 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>3.0 3.0 0.6</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>3.0 3.0 0.6</size></box></geometry><material><ambient>0.5 0.3 0.1 1</ambient><diffuse>0.5 0.3 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Narrow poles — tests agility between obstacles -->
+    <model name="pole_1"><static>true</static><pose>7 2 1.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><cylinder><radius>0.12</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.12</radius><length>3.0</length></cylinder></geometry><material><ambient>0.4 0.4 0.4 1</ambient></material></visual>
+      </link>
+    </model>
+    <model name="pole_2"><static>true</static><pose>7 4 1.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><cylinder><radius>0.12</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.12</radius><length>3.0</length></cylinder></geometry><material><ambient>0.4 0.4 0.4 1</ambient></material></visual>
+      </link>
+    </model>
+    <model name="pole_3"><static>true</static><pose>7 0 1.5 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><cylinder><radius>0.12</radius><length>3.0</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.12</radius><length>3.0</length></cylinder></geometry><material><ambient>0.4 0.4 0.4 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <!-- Hanging beam — tests ceiling clearance -->
+    <model name="hanging_beam"><static>true</static><pose>-7 5 4.2 0 0 0</pose>
+      <link name="link"><collision name="c"><geometry><box><size>0.3 4.0 0.3</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.3 4.0 0.3</size></box></geometry><material><ambient>0.3 0.3 0.3 1</ambient></material></visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

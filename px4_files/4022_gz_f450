@@ -1,0 +1,76 @@
+#!/bin/sh
+#
+# @name Gazebo F450
+#
+# @type Quadrotor
+#
+
+. ${R}etc/init.d/rc.mc_defaults
+
+PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
+PX4_GZ_WORLD=${PX4_GZ_WORLD:=indoor_obstacle}
+PX4_SIM_MODEL=${PX4_SIM_MODEL:=f450}
+
+# ── Gazebo simulation ──────────────────────────────────────
+param set-default SIM_GZ_EN 1
+param set-default SYS_AUTOSTART 4002
+
+# ── Airframe: quadrotor X ──────────────────────────────────
+param set-default CA_AIRFRAME 0
+param set-default CA_ROTOR_COUNT 4
+
+# ── Rotor positions (exact F450 mount points) ──────────────
+# Measured from mesh: x=±160.87mm, y=±160.87mm → ±0.16087m
+# KM positive = CCW, negative = CW
+# Order matches x500 airframe convention
+
+param set-default CA_ROTOR0_PX 0.13
+param set-default CA_ROTOR0_PY 0.22
+param set-default CA_ROTOR0_KM  0.05
+
+param set-default CA_ROTOR1_PX -0.13
+param set-default CA_ROTOR1_PY -0.20
+param set-default CA_ROTOR1_KM  0.05
+
+param set-default CA_ROTOR2_PX 0.13
+param set-default CA_ROTOR2_PY -0.22
+param set-default CA_ROTOR2_KM -0.05
+
+param set-default CA_ROTOR3_PX -0.13
+param set-default CA_ROTOR3_PY 0.20
+param set-default CA_ROTOR3_KM -0.05
+
+# Force set (not just default) so saved .bson cannot override
+# param set CA_ROTOR0_PX  0.16087
+# param set CA_ROTOR0_PY  0.16087
+# param set CA_ROTOR1_PX -0.16087
+# param set CA_ROTOR1_PY -0.16087
+# param set CA_ROTOR2_PX  0.16087
+# param set CA_ROTOR2_PY -0.16087
+# param set CA_ROTOR3_PX -0.16087
+# param set CA_ROTOR3_PY  0.16087
+param set MPC_THR_HOVER 0.45
+
+# ── ESC output mapping ─────────────────────────────────────
+param set-default SIM_GZ_EC_FUNC1 101
+param set-default SIM_GZ_EC_FUNC2 102
+param set-default SIM_GZ_EC_FUNC3 103
+param set-default SIM_GZ_EC_FUNC4 104
+param set-default SIM_GZ_EC_MIN1 150
+param set-default SIM_GZ_EC_MIN2 150
+param set-default SIM_GZ_EC_MIN3 150
+param set-default SIM_GZ_EC_MIN4 150
+param set-default SIM_GZ_EC_MAX1 1000
+param set-default SIM_GZ_EC_MAX2 1000
+param set-default SIM_GZ_EC_MAX3 1000
+param set-default SIM_GZ_EC_MAX4 1000
+
+# ── Flight tuning ──────────────────────────────────────────
+param set-default MPC_THR_HOVER 0.45
+param set-default NAV_DLL_ACT 0
+
+# ── SITL arming — disable checks not relevant in simulation ─
+param set-default COM_RCL_EXCEPT 4
+param set-default COM_RC_IN_MODE 1
+param set-default COM_DISARM_PRFLT 0
+param set-default COM_ARM_MAG_STR 0

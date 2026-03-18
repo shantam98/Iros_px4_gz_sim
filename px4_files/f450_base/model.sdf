@@ -1,0 +1,676 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version='1.9'>
+  <model name='f450_base'>
+    <pose>0 0 0.1 0 0 0</pose>
+    <self_collide>false</self_collide>
+    <static>false</static>
+
+    <!-- ══════════════════════════════════════════
+         BASE LINK
+    ══════════════════════════════════════════ -->
+    <link name="base_link">
+      <inertial>
+        <mass>1.477</mass>
+        <inertia>
+          <ixx>0.01152</ixx><ixy>0</ixy><ixz>0</ixz>
+          <iyy>0.01152</iyy><iyz>0</iyz>
+          <izz>0.0218</izz>
+        </inertia>
+      </inertial>
+
+      <gravity>true</gravity>
+      <velocity_decay/>
+
+      <!-- Visual: F450 DAE mesh (no baked rotors) -->
+      <visual name="base_link_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>file:///home/shantam/irobot/px4_sim/f450_quad_centered_scaled_norotor.dae</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.9 0.4 0.0 1</ambient>
+          <diffuse>0.9 0.4 0.0 1</diffuse>
+          <specular>0.3 0.3 0.3 1</specular>
+          <emissive>0.05 0.02 0.0 1</emissive>
+        </material>
+      </visual>
+
+      <!-- Collision: single STL mesh (no baked rotors) -->
+      <!-- <collision name="base_link_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>file:///home/shantam/irobot/px4_sim/f450_quad_centered_scaled_norotor.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction><ode/></friction>
+        </surface>
+      </collision> -->
+      <collision name="base_link_collision">
+        <pose>0 0 -.03 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.35355339059327373 0.35355339059327373 0.015</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.01</min_depth>
+              <max_vel>0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode />
+          </friction>
+        </surface>
+      </collision>
+
+      <!-- ══════════════════════════════════════════
+           PX4 REQUIRED SENSORS
+           Exact noise values from x500_base
+      ══════════════════════════════════════════ -->
+
+      <sensor name="air_pressure_sensor" type="air_pressure">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <air_pressure>
+          <pressure>
+            <noise type="gaussian">
+              <mean>0</mean>
+              <stddev>3</stddev>
+            </noise>
+          </pressure>
+        </air_pressure>
+      </sensor>
+
+      <sensor name="magnetometer_sensor" type="magnetometer">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>100</update_rate>
+        <magnetometer>
+          <x><noise type="gaussian"><stddev>0.0001</stddev></noise></x>
+          <y><noise type="gaussian"><stddev>0.0001</stddev></noise></y>
+          <z><noise type="gaussian"><stddev>0.0001</stddev></noise></z>
+        </magnetometer>
+      </sensor>
+
+      <sensor name="imu_sensor" type="imu">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>250</update_rate>
+        <imu>
+          <angular_velocity>
+            <x><noise type="gaussian"><mean>0.0</mean><stddev>0.0008726646</stddev></noise></x>
+            <y><noise type="gaussian"><mean>0.0</mean><stddev>0.0008726646</stddev></noise></y>
+            <z><noise type="gaussian"><mean>0.0</mean><stddev>0.0008726646</stddev></noise></z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x><noise type="gaussian"><mean>0.0</mean><stddev>0.00637</stddev></noise></x>
+            <y><noise type="gaussian"><mean>0.0</mean><stddev>0.00637</stddev></noise></y>
+            <z><noise type="gaussian"><mean>0.0</mean><stddev>0.00686</stddev></noise></z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
+
+      <sensor name="navsat_sensor" type="navsat">
+        <gz_frame_id>base_link</gz_frame_id>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+      </sensor>
+
+    </link>
+
+    <!-- ══════════════════════════════════════════
+         5x ToF SENSORS (A010, 72° ring)
+    ══════════════════════════════════════════ -->
+
+    <!-- <link name="tof_0_link">
+
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_0_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <pose>0.25 0 0 0 0 0</pose>
+      <sensor name="tof_0" type="depth_camera">
+        <gz_frame_id>tof_0_link</gz_frame_id>
+        <always_on>1</always_on><visualize>true</visualize><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_0_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_0_joint" type="fixed">
+      <parent>base_link</parent><child>tof_0_link</child>
+    </joint>
+
+    <link name="tof_1_link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_1_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+      <pose>0.077 0.236 0 0 0 1.2566</pose>
+      <sensor name="tof_1" type="depth_camera">
+        <gz_frame_id>tof_1_link</gz_frame_id>
+        <always_on>1</always_on><visualize>true</visualize><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+          </camera>
+          <topic>tof_1_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_1_joint" type="fixed">
+      <parent>base_link</parent><child>tof_1_link</child>
+    </joint>
+
+    <link name="tof_2_link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_2_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+      <pose>-0.202 0.147 0 0 0 2.5133</pose>
+      <sensor name="tof_2" type="depth_camera">
+        <gz_frame_id>tof_2_link</gz_frame_id>
+        <always_on>1</always_on><visualize>true</visualize><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_2_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_2_joint" type="fixed">
+      <parent>base_link</parent><child>tof_2_link</child>
+    </joint>
+
+    <link name="tof_3_link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_3_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <pose>-0.202 -0.147 0 0 0 -2.5133</pose>
+      <sensor name="tof_3" type="depth_camera">
+        <gz_frame_id>tof_3_link</gz_frame_id>
+        <always_on>1</always_on><visualize>true</visualize><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_3_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_3_joint" type="fixed">
+      <parent>base_link</parent><child>tof_3_link</child>
+    </joint>
+
+    <link name="tof_4_link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_4_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+      <pose>0.077 -0.236 0 0 0 -1.2566</pose>
+      <sensor name="tof_4" type="depth_camera">
+        <gz_frame_id>tof_4_link</gz_frame_id>
+        <always_on>1</always_on><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <visualize>true</visualize>
+        <topic>tof_4_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_4_joint" type="fixed">
+      <parent>base_link</parent><child>tof_4_link</child>
+    </joint> -->
+
+    <!-- Single shared ToF link, centered at drone origin -->
+    <link name="tof_array_link">
+      <inertial>
+        <mass>0.005</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz>
+                <iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+    </link>
+    <joint name="tof_array_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>tof_array_link</child>
+    </joint>
+
+      <!-- ToF 0: front, 0° -->
+    <link name="tof_0_link">
+      <pose>0.25 0 0  0 0 0</pose>          <!-- front, 0° yaw -->
+      <inertial><mass>0.0001</mass>
+        <inertia><ixx>1e-9</ixx><ixy>0</ixy><ixz>0</ixz>
+                <iyy>1e-9</iyy><iyz>0</iyz><izz>1e-9</izz></inertia>
+      </inertial>
+      <sensor name="tof_0" type="depth_camera">         <!-- offset from tof_array_link -->
+        <gz_frame_id>tof_0_link</gz_frame_id>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+        <update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_0_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_0_joint" type="fixed">
+      <parent>tof_array_link</parent>   <!-- parent is tof_array_link, not base_link -->
+      <child>tof_0_link</child>
+    </joint>
+
+      <!-- ToF 1: front-left, 72° -->
+    <link name="tof_1_link">
+      <pose>0.077 0.236 0  0 0 1.2566</pose> <!-- front-left, 72° yaw -->
+      <inertial><mass>0.0001</mass>
+        <inertia><ixx>1e-9</ixx><ixy>0</ixy><ixz>0</ixz>
+                <iyy>1e-9</iyy><iyz>0</iyz><izz>1e-9</izz></inertia>
+      </inertial>
+
+      <sensor name="tof_1" type="depth_camera">
+        <gz_frame_id>tof_1_link</gz_frame_id>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+        <update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_1_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_1_joint" type="fixed">
+      <parent>tof_array_link</parent>
+      <child>tof_1_link</child>
+    </joint>
+
+    <link name="tof_2_link">
+      <pose>-0.202 0.147 0  0 0 2.5133</pose> <!-- rear-left, 144° yaw -->
+      <inertial><mass>0.0001</mass>
+        <inertia><ixx>1e-9</ixx><ixy>0</ixy><ixz>0</ixz>
+                <iyy>1e-9</iyy><iyz>0</iyz><izz>1e-9</izz></inertia>
+      </inertial>
+
+      <!-- ToF 2: rear-left, 144° -->
+      <sensor name="tof_2" type="depth_camera">
+        <gz_frame_id>tof_2_link</gz_frame_id>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+        <update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_2_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_2_joint" type="fixed">
+      <parent>tof_array_link</parent>
+      <child>tof_2_link</child>
+    </joint>
+
+    <link name="tof_3_link">
+      <pose>-0.202 -0.147 0  0 0 -2.5133</pose> <!-- rear-right, -144° yaw -->
+      <inertial><mass>0.0001</mass>
+        <inertia><ixx>1e-9</ixx><ixy>0</ixy><ixz>0</ixz>
+                <iyy>1e-9</iyy><iyz>0</iyz><izz>1e-9</izz></inertia>
+      </inertial>
+
+      <!-- ToF 3: rear-right, -144° -->
+      <sensor name="tof_3" type="depth_camera">
+        <gz_frame_id>tof_3_link</gz_frame_id>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+        <update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_3_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_3_joint" type="fixed">
+      <parent>tof_array_link</parent>
+      <child>tof_3_link</child>
+    </joint>
+
+    <link name="tof_4_link">
+      <pose>0.077 -0.236 0  0 0 -1.2566</pose> <!-- front-right, -72° yaw -->
+      <inertial><mass>0.0001</mass>
+        <inertia><ixx>1e-9</ixx><ixy>0</ixy><ixz>0</ixz>
+                <iyy>1e-9</iyy><iyz>0</iyz><izz>1e-9</izz></inertia>
+      </inertial>
+
+      <!-- ToF 4: front-right, -72° -->
+      <sensor name="tof_4" type="depth_camera">
+        <gz_frame_id>tof_4_link</gz_frame_id>
+        <always_on>1</always_on>
+        <visualize>true</visualize>
+        <update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_4_depth</topic>
+      </sensor>
+
+    </link>
+    <joint name="tof_4_joint" type="fixed">
+      <parent>tof_array_link</parent>
+      <child>tof_4_link</child>
+    </joint>
+
+    <!-- ══════════════════════════════════════════
+         RGBD FRONT CAMERA
+    ══════════════════════════════════════════ -->
+    <link name="rgbd_cam_link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+
+      <pose>0.2 0 0.02 0 0 0</pose>
+
+      <collision name="rgbd_cam_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <sensor name="rgbd_camera_rgb" type="camera">
+        <gz_frame_id>rgbd_cam_link</gz_frame_id>
+        <always_on>1</always_on><update_rate>30</update_rate>
+        <camera>
+          <horizontal_fov>1.047</horizontal_fov>
+          <image><width>1280</width><height>720</height></image>
+          <clip><near>0.1</near><far>10.0</far></clip>
+          <noise><type>gaussian</type><mean>0</mean><stddev>0.005</stddev></noise>
+        </camera>
+        <visualize>true</visualize>
+        <topic>rgbd_image</topic>
+      </sensor>
+
+      <sensor name="rgbd_camera" type="depth_camera">
+        <gz_frame_id>rgbd_cam_link</gz_frame_id>
+        <always_on>1</always_on><update_rate>30</update_rate>
+        <camera>
+          <horizontal_fov>1.047</horizontal_fov>
+          <image><width>1280</width><height>720</height><format>R_FLOAT32</format></image>
+          <clip><near>0.1</near><far>10.0</far></clip>
+          <noise><type>gaussian</type><mean>0</mean><stddev>0.005</stddev></noise>
+        </camera>
+        <visualize>true</visualize>
+        <topic>rgbd_depth</topic>
+      </sensor>
+    </link>
+    <joint name="rgbd_cam_joint" type="fixed">
+      <parent>base_link</parent><child>rgbd_cam_link</child>
+    </joint>
+
+    <!-- ══════════════════════════════════════════
+         BOTTOM DEPTH CAMERA
+    ══════════════════════════════════════════ -->
+    <link name="bottom_cam_link">
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <pose>0 0 -0.05 0 1.5708 0</pose>
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <sensor name="bottom_camera" type="depth_camera">
+        <gz_frame_id>bottom_cam_link</gz_frame_id>
+        <always_on>1</always_on><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <visualize>true</visualize>
+        <topic>bottom_depth_camera</topic>
+      </sensor>
+    </link>
+    <joint name="bottom_cam_joint" type="fixed">
+      <parent>base_link</parent><child>bottom_cam_link</child>
+    </joint>
+
+    <!-- ══════════════════════════════════════════
+         MOTOR BASES (static visuals at arm tips)
+         Exact F450 positions: ±160.87mm = ±0.16087m
+    ══════════════════════════════════════════ -->
+<!--
+    <link name="motor_base_0">
+      <pose>0.16087 0.16087 0.03 0 0 -0.45</pose>
+      <visual name="v"><geometry><mesh><scale>1 1 1</scale><uri>model://x500_base/meshes/5010Base.dae</uri></mesh></geometry></visual>
+    </link>
+    <joint name="motor_base_0_joint" type="fixed">
+      <parent>base_link</parent><child>motor_base_0</child>
+    </joint>
+
+    <link name="motor_base_1">
+      <pose>-0.16087 -0.16087 0.03 0 0 -0.45</pose>
+      <visual name="v"><geometry><mesh><scale>1 1 1</scale><uri>model://x500_base/meshes/5010Base.dae</uri></mesh></geometry></visual>
+    </link>
+    <joint name="motor_base_1_joint" type="fixed">
+      <parent>base_link</parent><child>motor_base_1</child>
+    </joint>
+
+    <link name="motor_base_2">
+      <pose>0.16087 -0.16087 0.03 0 0 -0.45</pose>
+      <visual name="v"><geometry><mesh><scale>1 1 1</scale><uri>model://x500_base/meshes/5010Base.dae</uri></mesh></geometry></visual>
+    </link>
+    <joint name="motor_base_2_joint" type="fixed">
+      <parent>base_link</parent><child>motor_base_2</child>
+    </joint>
+
+    <link name="motor_base_3">
+      <pose>-0.16087 0.16087 0.03 0 0 -0.45</pose>
+      <visual name="v"><geometry><mesh><scale>1 1 1</scale><uri>model://x500_base/meshes/5010Base.dae</uri></mesh></geometry></visual>
+    </link>
+    <joint name="motor_base_3_joint" type="fixed">
+      <parent>base_link</parent><child>motor_base_3</child>
+    </joint> -->
+
+    <!-- ══════════════════════════════════════════
+         ROTORS (revolute — generate lift)
+         z = 0.03 (frame top) + 0.032 (motor) = 0.062m
+         Order matches CA_ROTOR params in airframe:
+           rotor_0: front-left   CCW  (+x, +y)
+           rotor_1: rear-right   CCW  (-x, -y)
+           rotor_2: front-right  CW   (+x, -y)
+           rotor_3: rear-left    CW   (-x, +y)
+    ══════════════════════════════════════════ -->
+
+    <link name="rotor_0">
+      <!-- front-left CCW — matches CA_ROTOR0 (+x,+y) -->
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <pose>0.16087 -0.16087 0.062 0 0 0</pose>
+      <self_collide>false</self_collide>
+      <inertial>
+        <mass>0.016076923076923075</mass>
+        <inertia><ixx>3.8464910483993325e-07</ixx><ixy>0</ixy><ixz>0</ixz><iyy>2.6115851691700804e-05</iyy><iyz>0</iyz><izz>2.649858234714004e-05</izz></inertia>
+      </inertial>
+      <visual name="rotor_0_visual">
+        <pose>-0.022 -0.146 -0.016 0 0 0</pose>
+        <geometry><mesh><scale>0.846 0.846 0.846</scale><uri>model://x500_base/meshes/1345_prop_ccw.stl</uri></mesh></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+      </visual>
+      <visual name="rotor_0_bell">
+        <pose>0 0 -0.032 0 0 0</pose>
+        <geometry><mesh><scale>1 1 1</scale><uri>model://x500_base/meshes/5010Bell.dae</uri></mesh></geometry>
+      </visual>
+      <collision name="rotor_0_collision">
+        <geometry><box><size>0.279 0.017 0.001</size></box></geometry>
+        <surface><contact><ode><min_depth>0.001</min_depth><max_vel>0</max_vel></ode></contact><friction><ode/></friction></surface>
+      </collision>
+    </link>
+    <joint name="rotor_0_joint" type="revolute">
+      <parent>base_link</parent><child>rotor_0</child>
+      <axis><xyz>0 0 1</xyz><limit><lower>-1e+16</lower><upper>1e+16</upper></limit><dynamics><spring_reference>0</spring_reference><spring_stiffness>0</spring_stiffness></dynamics></axis>
+    </joint>
+
+    <link name="rotor_1">
+      <gravity>true</gravity><self_collide>false</self_collide><velocity_decay/>
+      <pose>-0.16087 0.16087 0.062 0 0 0</pose>
+      <inertial>
+        <mass>0.016076923076923075</mass>
+        <inertia><ixx>3.8464910483993325e-07</ixx><ixy>0</ixy><ixz>0</ixz><iyy>2.6115851691700804e-05</iyy><iyz>0</iyz><izz>2.649858234714004e-05</izz></inertia>
+      </inertial>
+      <visual name="rotor_1_visual">
+        <pose>-0.022 -0.146 -0.016 0 0 0</pose>
+        <geometry><mesh><scale>0.846 0.846 0.846</scale><uri>model://x500_base/meshes/1345_prop_ccw.stl</uri></mesh></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+      </visual>
+      <visual name="rotor_1_bell">
+        <pose>0 0 -0.032 0 0 0</pose>
+        <geometry><mesh><scale>1 1 1</scale><uri>model://x500_base/meshes/5010Bell.dae</uri></mesh></geometry>
+      </visual>
+      <collision name="rotor_1_collision">
+        <geometry><box><size>0.279 0.017 0.001</size></box></geometry>
+        <surface><contact><ode><min_depth>0.001</min_depth><max_vel>0</max_vel></ode></contact><friction><ode/></friction></surface>
+      </collision>
+    </link>
+    <joint name="rotor_1_joint" type="revolute">
+      <parent>base_link</parent><child>rotor_1</child>
+      <axis><xyz>0 0 1</xyz><limit><lower>-1e+16</lower><upper>1e+16</upper></limit><dynamics><spring_reference>0</spring_reference><spring_stiffness>0</spring_stiffness></dynamics></axis>
+    </joint>
+
+    <link name="rotor_2">
+      <gravity>true</gravity><self_collide>false</self_collide><velocity_decay/>
+      <pose>0.16087 0.16087 0.062 0 0 0</pose>
+      <inertial>
+        <mass>0.016076923076923075</mass>
+        <inertia><ixx>3.8464910483993325e-07</ixx><ixy>0</ixy><ixz>0</ixz><iyy>2.6115851691700804e-05</iyy><iyz>0</iyz><izz>2.649858234714004e-05</izz></inertia>
+      </inertial>
+      <visual name="rotor_2_visual">
+        <pose>-0.022 -0.146 -0.016 0 0 0</pose>
+        <geometry><mesh><scale>0.846 0.846 0.846</scale><uri>model://x500_base/meshes/1345_prop_cw.stl</uri></mesh></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+      </visual>
+      <visual name="rotor_2_bell">
+        <pose>0 0 -0.032 0 0 0</pose>
+        <geometry><mesh><scale>1 1 1</scale><uri>model://x500_base/meshes/5010Bell.dae</uri></mesh></geometry>
+      </visual>
+      <collision name="rotor_2_collision">
+        <geometry><box><size>0.279 0.017 0.001</size></box></geometry>
+        <surface><contact><ode><min_depth>0.001</min_depth><max_vel>0</max_vel></ode></contact><friction><ode/></friction></surface>
+      </collision>
+    </link>
+    <joint name="rotor_2_joint" type="revolute">
+      <parent>base_link</parent><child>rotor_2</child>
+      <axis><xyz>0 0 1</xyz><limit><lower>-1e+16</lower><upper>1e+16</upper></limit><dynamics><spring_reference>0</spring_reference><spring_stiffness>0</spring_stiffness></dynamics></axis>
+    </joint>
+
+    <link name="rotor_3">
+      <gravity>true</gravity><self_collide>false</self_collide><velocity_decay/>
+      <pose>-0.16087 -0.16087 0.062 0 0 0</pose>
+      <inertial>
+        <mass>0.016076923076923075</mass>
+        <inertia><ixx>3.8464910483993325e-07</ixx><ixy>0</ixy><ixz>0</ixz><iyy>2.6115851691700804e-05</iyy><iyz>0</iyz><izz>2.649858234714004e-05</izz></inertia>
+      </inertial>
+      <visual name="rotor_3_visual">
+        <pose>-0.022 -0.146 -0.016 0 0 0</pose>
+        <geometry><mesh><scale>0.846 0.846 0.846</scale><uri>model://x500_base/meshes/1345_prop_cw.stl</uri></mesh></geometry>
+        <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+      </visual>
+      <visual name="rotor_3_bell">
+        <pose>0 0 -0.032 0 0 0</pose>
+        <geometry><mesh><scale>1 1 1</scale><uri>model://x500_base/meshes/5010Bell.dae</uri></mesh></geometry>
+      </visual>
+      <collision name="rotor_3_collision">
+        <geometry><box><size>0.279 0.017 0.001</size></box></geometry>
+        <surface><contact><ode><min_depth>0.001</min_depth><max_vel>0</max_vel></ode></contact><friction><ode/></friction></surface>
+      </collision>
+    </link>
+    <joint name="rotor_3_joint" type="revolute">
+      <parent>base_link</parent><child>rotor_3</child>
+      <axis><xyz>0 0 1</xyz><limit><lower>-1e+16</lower><upper>1e+16</upper></limit><dynamics><spring_reference>0</spring_reference><spring_stiffness>0</spring_stiffness></dynamics></axis>
+    </joint>
+
+  </model>
+</sdf>

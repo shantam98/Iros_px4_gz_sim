@@ -1,0 +1,129 @@
+# ============================================================
+# ros_gz_bridge config for F450 drone sensors
+# Compatible with: ros-humble-ros-gzharmonic-bridge
+# Gazebo Harmonic 8.x + ROS2 Humble
+#
+# Run with:
+#   ros2 run ros_gz_bridge parameter_bridge \
+#     --ros-args -p config_file:=<path>/sensor_bridge.yaml
+#
+# NOTE: All 5 ToF sensors are now on a single 'tof_array_link'
+#       in the SDF, but bridge topics are unchanged.
+# ============================================================
+
+# ── ToF Array (all 5 sensors share tof_array_link frame) ───
+# depth image topics (32FC1 float — use Normalize Range in RViz2)
+
+- ros_topic_name: "/drone/tof_0/depth"
+  gz_topic_name:  "/tof_0_depth"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/tof_0/points"
+  gz_topic_name:  "/tof_0_depth/points"
+  ros_type_name:  "sensor_msgs/msg/PointCloud2"
+  gz_type_name:   "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/tof_1/depth"
+  gz_topic_name:  "/tof_1_depth"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/tof_1/points"
+  gz_topic_name:  "/tof_1_depth/points"
+  ros_type_name:  "sensor_msgs/msg/PointCloud2"
+  gz_type_name:   "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/tof_2/depth"
+  gz_topic_name:  "/tof_2_depth"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/tof_2/points"
+  gz_topic_name:  "/tof_2_depth/points"
+  ros_type_name:  "sensor_msgs/msg/PointCloud2"
+  gz_type_name:   "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/tof_3/depth"
+  gz_topic_name:  "/tof_3_depth"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/tof_3/points"
+  gz_topic_name:  "/tof_3_depth/points"
+  ros_type_name:  "sensor_msgs/msg/PointCloud2"
+  gz_type_name:   "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/tof_4/depth"
+  gz_topic_name:  "/tof_4_depth"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/tof_4/points"
+  gz_topic_name:  "/tof_4_depth/points"
+  ros_type_name:  "sensor_msgs/msg/PointCloud2"
+  gz_type_name:   "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+# ── RGBD Front Camera ───────────────────────────────────────
+
+- ros_topic_name: "/drone/rgbd/image"
+  gz_topic_name:  "/rgbd_image"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/rgbd/camera_info"
+  gz_topic_name:  "/rgbd_image/camera_info"
+  ros_type_name:  "sensor_msgs/msg/CameraInfo"
+  gz_type_name:   "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/rgbd/depth"
+  gz_topic_name:  "/rgbd_depth"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/rgbd/points"
+  gz_topic_name:  "/rgbd_depth/points"
+  ros_type_name:  "sensor_msgs/msg/PointCloud2"
+  gz_type_name:   "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+# ── Bottom Depth Camera ─────────────────────────────────────
+
+- ros_topic_name: "/drone/bottom_cam/depth"
+  gz_topic_name:  "/bottom_depth_camera"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/bottom_cam/points"
+  gz_topic_name:  "/bottom_depth_camera/points"
+  ros_type_name:  "sensor_msgs/msg/PointCloud2"
+  gz_type_name:   "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+
+# ── IMU ─────────────────────────────────────────────────────
+- ros_topic_name: "/drone/imu"
+  gz_topic_name:  "/world/indoor_obstacle/model/f450_0/link/base_link/sensor/imu_sensor/imu"
+  ros_type_name:  "sensor_msgs/msg/Imu"
+  gz_type_name:   "gz.msgs.IMU"
+  direction: GZ_TO_ROS
+
+# ── GPS ─────────────────────────────────────────────────────
+- ros_topic_name: "/drone/gps"
+  gz_topic_name:  "/world/indoor_obstacle/model/f450_0/link/base_link/sensor/navsat_sensor/navsat"
+  ros_type_name:  "sensor_msgs/msg/NavSatFix"
+  gz_type_name:   "gz.msgs.NavSat"
+  direction: GZ_TO_ROS
