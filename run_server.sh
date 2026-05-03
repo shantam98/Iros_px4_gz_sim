@@ -41,36 +41,27 @@ ROS="source /opt/ros/humble/setup.bash"
 WS="source $PX4_ROS2_WS/install/setup.bash && source $PLANNER_WS/install/setup.bash"
 SING="singularity exec $SIF"
 
-# ── Launch tabs ───────────────────────────────────────────────────────────────
-gnome-terminal \
-  --tab --title="T1: PX4 + Gazebo" \
-  --command="bash -c '
-    $SING bash -c \"cd $PX4_DIR && PX4_GZ_WORLD=indoor_obstacle make px4_sitl gz_f450\" \
-      2>&1 | tee $LOG_DIR/px4_gazebo.log
-    exec bash'" \
-  \
-  --tab --title="T2: DDS Agent" \
-  --command="bash -c '
-    sleep 10
-    $SING $DDS_AGENT udp4 -p 8888 2>&1 | tee $LOG_DIR/dds_agent.log
-    exec bash'" \
-  \
-  --tab --title="T3: Sensor Bridge" \
-  --command="bash -c '
-    sleep 15
-    $SING bash -c \"$ROS && source $PX4_ROS2_WS/install/setup.bash && \
+# ── Launch terminals (xterm) ──────────────────────────────────────────────────
+xterm -title "T1: PX4 + Gazebo" -e bash -c \
+    "$SING bash -c 'cd $PX4_DIR && PX4_GZ_WORLD=indoor_obstacle make px4_sitl gz_f450' \
+     2>&1 | tee $LOG_DIR/px4_gazebo.log; exec bash" &
+
+sleep 10
+xterm -title "T2: DDS Agent" -e bash -c \
+    "$SING $DDS_AGENT udp4 -p 8888 2>&1 | tee $LOG_DIR/dds_agent.log; exec bash" &
+
+sleep 5
+xterm -title "T3: Sensor Bridge" -e bash -c \
+    "$SING bash -c '$ROS && source $PX4_ROS2_WS/install/setup.bash && \
       ros2 run ros_gz_bridge parameter_bridge \
-        --ros-args --params-file $BRIDGE_YAML\" \
-      2>&1 | tee $LOG_DIR/sensor_bridge.log
-    exec bash'" \
-  \
-  --tab --title="T4: Planner Stack" \
-  --command="bash -c '
-    sleep 20
-    $SING bash -c \"$ROS && $WS && \
-      ros2 launch uav_bringup full_stack.launch.py with_global_planner:=false\" \
-      2>&1 | tee $LOG_DIR/planner.log
-    exec bash'"
+        --ros-args --params-file $BRIDGE_YAML' \
+     2>&1 | tee $LOG_DIR/sensor_bridge.log; exec bash" &
+
+sleep 5
+xterm -title "T4: Planner Stack" -e bash -c \
+    "$SING bash -c '$ROS && $WS && \
+      ros2 launch uav_bringup full_stack.launch.py with_global_planner:=false' \
+     2>&1 | tee $LOG_DIR/planner.log; exec bash" &
 
 echo ""
 echo "All terminals launched. Logs → $LOG_DIR/"
