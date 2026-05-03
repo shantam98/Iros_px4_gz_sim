@@ -11,7 +11,7 @@ set -euo pipefail
 
 # ── Paths (auto-detect user ID via whoami) ────────────────────────────────────
 BASE="/scratch/$(whoami)/irobot"
-SIF="${SIF:-$BASE/px4_sim/uav_stack.sif}"
+SIF="${SIF:-$BASE/uav_stack.sif}"
 PX4_DIR="${PX4_DIR:-$BASE/px4_autopilot}"
 DDS_AGENT="${DDS_AGENT:-$BASE/Micro-XRCE-DDS-Agent/build/MicroXRCEAgent}"
 BRIDGE_YAML="${BRIDGE_YAML:-$BASE/px4_sim/sensor_bridge.yaml}"
