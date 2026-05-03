@@ -17,6 +17,9 @@ From: ubuntu:22.04
     export DEBIAN_FRONTEND=noninteractive
     export TZ=Asia/Singapore
 
+    # ── Create dirs required by NUS server bind mounts ────────────────────────
+    mkdir -p /app1 /scratch
+
     # ── Base system ───────────────────────────────────────────────────────────
     apt-get update && apt-get install -y \
         locales curl wget gnupg2 lsb-release \
