@@ -27,7 +27,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>file:///home/shantam/irobot/px4_sim/f450_quad_centered_scaled_norotor.dae</uri>
+            <uri>model://f450_base/meshes/f450_quad_centered_scaled_norotor.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -44,7 +44,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>file:///home/shantam/irobot/px4_sim/f450_quad_centered_scaled_norotor.stl</uri>
+            <uri>model://f450_base/meshes/f450_quad_centered_scaled_norotor.stl</uri>
           </mesh>
         </geometry>
         <surface>
