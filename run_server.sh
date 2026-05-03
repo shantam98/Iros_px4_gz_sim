@@ -39,7 +39,7 @@ echo "========================================"
 # ── Shared setup strings ──────────────────────────────────────────────────────
 ROS="source /opt/ros/humble/setup.bash"
 WS="source $PX4_ROS2_WS/install/setup.bash && source $PLANNER_WS/install/setup.bash"
-SING="singularity exec $SIF"
+SING="singularity exec --nvccli $SIF"
 
 # ── Launch terminals (xterm) ──────────────────────────────────────────────────
 xterm -title "T1: PX4 + Gazebo" -e bash -c \
