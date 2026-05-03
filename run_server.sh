@@ -54,7 +54,7 @@ sleep 5
 xterm -title "T3: Sensor Bridge" -e bash -c \
     "$SING bash -c '$ROS && source $PX4_ROS2_WS/install/setup.bash && \
       ros2 run ros_gz_bridge parameter_bridge \
-        --ros-args --params-file $BRIDGE_YAML' \
+        --ros-args -p config_file:=$BRIDGE_YAML' \
      2>&1 | tee $LOG_DIR/sensor_bridge.log; exec bash" &
 
 sleep 5
