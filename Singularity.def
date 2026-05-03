@@ -61,6 +61,7 @@ From: /scratch/YOURID/singularity/ros2_humble.sif
     apt-get update && apt-get install -y \
         gcc-arm-none-eabi \
         libxml2-utils \
+        python3-pip \
         && rm -rf /var/lib/apt/lists/*
 
     pip3 install --no-cache-dir \
