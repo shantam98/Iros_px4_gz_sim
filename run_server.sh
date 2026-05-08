@@ -15,7 +15,7 @@ SIF="${SIF:-$BASE/uav_stack.sif}"
 PX4_DIR="${PX4_DIR:-$BASE/px4_autopilot}"
 DDS_AGENT="${DDS_AGENT:-$BASE/Micro-XRCE-DDS-Agent/build/MicroXRCEAgent}"
 BRIDGE_YAML="${BRIDGE_YAML:-$BASE/px4_sim/sensor_bridge.yaml}"
-PX4_ROS_WS="${PX4_ROS_WS:-$BASE/px4_ros_ws}"
+PX4_ROS_WS="${PX4_ROS_WS:-$BASE/px4_ros2_ws}"
 PLANNER_WS="${PLANNER_WS:-$BASE/planner_ws}"
 LOG_DIR="${LOG_DIR:-$BASE/logs}"
 
