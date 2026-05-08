@@ -53,6 +53,15 @@ else
   echo "      Inserted 4022_gz_f450 after 4021_gz_x500_flow"
 fi
 
+# ── 2b. Sync airframe to build rootfs if already built ───────────────────────
+BUILD_AIRFRAMES="$PX4_DIR/build/px4_sitl_default/rootfs/etc/init.d-posix/airframes"
+if [ -d "$BUILD_AIRFRAMES" ]; then
+  cp "$PX4_FILES/4022_gz_f450" "$BUILD_AIRFRAMES/4022_gz_f450"
+  echo "      Also synced → $BUILD_AIRFRAMES/4022_gz_f450"
+else
+  echo "      Build dir not found — will be created on next build."
+fi
+
 # ── 3. Drone models ───────────────────────────────────────────────────────────
 echo ""
 echo "[3/4] Installing drone models (f450, f450_base + meshes)..."
