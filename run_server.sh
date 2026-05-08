@@ -51,16 +51,16 @@ echo "[T1] Launching PX4 + Gazebo..."
 xterm -title "T1: PX4 + Gazebo" -e bash -c \
   "$APT bash -c '$SRC && cd $PX4_DIR && PX4_GZ_WORLD=indoor_obstacle make px4_sitl gz_f450 2>&1 | tee $LOG_DIR/px4_gazebo.log'; exec bash" &
 
-echo "     Waiting 60 s for PX4 + Gazebo to initialise..."
-sleep 60
+echo "     Waiting 30 s for PX4 + Gazebo to initialise..."
+sleep 30
 
 # ── T2: MicroXRCE-DDS Agent ───────────────────────────────────────────────────
 echo "[T2] Launching MicroXRCE-DDS Agent..."
 xterm -title "T2: DDS Agent" -e bash -c \
   "$APT bash -c '$SRC && $DDS_AGENT udp4 -p 8888 2>&1 | tee $LOG_DIR/dds_agent.log'; exec bash" &
 
-echo "     Waiting 30 s for DDS agent to connect..."
-sleep 30
+echo "     Waiting 20 s for DDS agent to connect..."
+sleep 20
 
 # ── T3: ROS-GZ Sensor Bridge ─────────────────────────────────────────────────
 echo "[T3] Launching Sensor Bridge..."
@@ -79,9 +79,13 @@ xterm -title "T4: UAV Bringup" -e bash -c \
     with_global_planner:=false \
     2>&1 | tee $LOG_DIR/planner.log'; exec bash" &
 
+# ── T5: Interactive shell (waypoint / bag commands) ──────────────────────────
+xterm -title "T5: UAV Shell" -e bash -c \
+  "$APT bash -c '$SRC && exec bash'" &
+
 echo ""
 echo "========================================"
-echo " All 4 terminals launched. Logs → $LOG_DIR/"
+echo " All 5 terminals launched. Logs → $LOG_DIR/"
 echo ""
 echo " When ready — send a waypoint:"
 echo "   $APT bash -c \"$SRC && \\"
