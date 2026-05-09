@@ -39,16 +39,16 @@ echo ""
 # ── Open 4 gnome-terminal tabs ────────────────────────────────────────────────
 gnome-terminal \
   --tab --title="T1: PX4 SITL" \
-  --command="bash -c 'cd $PX4_DIR && PX4_GZ_WORLD=indoor_obstacle make px4_sitl gz_f450; exec bash'" \
+  --command="bash -c 'cd $PX4_DIR && HEADLESS=${HEADLESS:-0} PX4_GZ_WORLD=indoor_obstacle make px4_sitl gz_f450; exec bash'" \
   \
   --tab --title="T2: DDS Agent" \
-  --command="bash -c 'sleep 5 && $DDS_AGENT udp4 -p 8888; exec bash'" \
+  --command="bash -c 'sleep 10 && $DDS_AGENT udp4 -p 8888; exec bash'" \
   \
   --tab --title="T3: Sensor Bridge" \
-  --command="bash -c 'sleep 8 && source $ROS2_SETUP && source $PX4_ROS2_WS/install/setup.bash && ros2 run ros_gz_bridge parameter_bridge --ros-args --params-file $BRIDGE_YAML; exec bash'" \
+  --command="bash -c 'sleep 20 && source $ROS2_SETUP && source $PX4_ROS2_WS/install/setup.bash && ros2 run ros_gz_bridge parameter_bridge --ros-args -p config_file:=$BRIDGE_YAML; exec bash'" \
   \
   --tab --title="T4: Planner Stack" \
-  --command="bash -c 'sleep 12 && source $ROS2_SETUP && source $PX4_ROS2_WS/install/setup.bash && source $PLANNER_WS/install/setup.bash && ros2 launch uav_bringup full_stack.launch.py with_global_planner:=false; exec bash'"
+  --command="bash -c 'sleep 25 && source $ROS2_SETUP && source $PX4_ROS2_WS/install/setup.bash && source $PLANNER_WS/install/setup.bash && ros2 launch uav_bringup full_stack.launch.py with_global_planner:=false; exec bash'"
 
 echo "All terminals launched."
 echo ""
