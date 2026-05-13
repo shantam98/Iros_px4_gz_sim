@@ -1,0 +1,113 @@
+Bootstrap: localimage
+# ┌───────────────────────────────────────────────────────────────┐
+# │  isaac_vslam.sif — cuVSLAM + nvblox on top of Triton 24.08    │
+# │                                                               │
+# │  Base: nvcr.io/nvidia/tritonserver:24.08-py3                   │
+# │  CUDA 12.6 (fits inside hosts with CUDA <=12.9 driver)        │
+# │                                                               │
+# │  PREREQUISITE: pull the base SIF first ──                     │
+# │    cd /scratch/$USER/singularity                              │
+# │    singularity pull tritonserver_24.08.sif \                  │
+# │        docker://nvcr.io/nvidia/tritonserver:24.08-py3         │
+# │                                                               │
+# │  BUILD:                                                        │
+# │    cd /scratch/$USER/irobot/px4_sim                           │
+# │    singularity build --fakeroot \                             │
+# │        /scratch/$USER/irobot/isaac_vslam.sif IsaacVslam.def   │
+# │                                                               │
+# │  >>> EDIT THE NEXT LINE: replace <id> with your scratch id <<<│
+# └───────────────────────────────────────────────────────────────┘
+From: /scratch/e1553950/singularity/tritonserver_24.08.sif
+
+%post
+    set -e
+    export DEBIAN_FRONTEND=noninteractive
+
+    # ── 1. Base tools + locale ──────────────────────────────────
+    apt-get update
+    apt-get install -y --no-install-recommends \
+        locales curl gnupg2 lsb-release software-properties-common \
+        build-essential cmake git ca-certificates wget
+    locale-gen en_US en_US.UTF-8
+    update-locale LANG=en_US.UTF-8
+
+    # ── 2. ROS 2 Humble apt repo (modern signed-by keyring) ─────
+    curl -fsSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+        | gpg --dearmor -o /usr/share/keyrings/ros-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" \
+        > /etc/apt/sources.list.d/ros2.list
+
+    # ── 3. Isaac ROS apt repo (release-3, matches Dockerfile.base) ──
+    curl -fsSL https://isaac.download.nvidia.com/isaac-ros/repos.key \
+        | gpg --dearmor -o /usr/share/keyrings/isaac-ros-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/isaac-ros-archive-keyring.gpg] https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) release-3.0" \
+        > /etc/apt/sources.list.d/isaac-ros.list
+
+    apt-get update
+
+    # ── 4. ROS 2 Humble base ────────────────────────────────────
+    apt-get install -y --no-install-recommends \
+        ros-humble-ros-base \
+        python3-colcon-common-extensions \
+        python3-rosdep \
+        libceres-dev
+
+    # ── 5. Isaac ROS visual_slam + nvblox ───────────────────────
+    apt-get install -y --no-install-recommends \
+        ros-humble-isaac-ros-visual-slam \
+        ros-humble-isaac-ros-visual-slam-interfaces \
+        ros-humble-isaac-ros-nvblox \
+        ros-humble-isaac-ros-nvblox-msgs \
+        ros-humble-isaac-ros-image-proc
+
+    # ── 6. (Escape hatches — leave commented until needed) ──────
+    #
+    # ── 6a. CUDSS (needed if cuVSLAM requires CUDA-Ceres) ──
+    # cd /tmp
+    # wget -q https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.3.0.9_cuda12-archive.tar.xz
+    # tar -xf libcudss-linux-x86_64-0.3.0.9_cuda12-archive.tar.xz -C /usr/local
+    # cp -r /usr/local/libcudss-linux-x86_64-0.3.0.9_cuda12-archive /usr/local/libcudss-linux-0.3.0.9_cuda12-archive
+    # rm libcudss-linux-x86_64-0.3.0.9_cuda12-archive.tar.xz
+    #
+    # ── 6b. Protobuf 5.26 from source (if ABI mismatch) ──
+    # cd /tmp
+    # git clone https://github.com/protocolbuffers/protobuf.git -b v5.26.0
+    # cd protobuf && git submodule update --init --recursive
+    # mkdir build && cd build
+    # cmake .. -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BUILD_SHARED_LIBS=ON \
+    #          -DABSL_PROPAGATE_CXX_STD=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    # make -j$(nproc) && make install
+    # cd / && rm -rf /tmp/protobuf
+    #
+    # ── 6c. CUDA-accelerated Ceres from source (needs 6a first) ──
+    # cd /tmp
+    # git clone https://github.com/ceres-solver/ceres-solver.git
+    # cd ceres-solver && git checkout 6fb3dae4eeef855568e47ebbb29a8ba4f3c9153f
+    # mkdir build && cd build
+    # cmake .. -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DBUILD_BENCHMARKS=OFF \
+    #          -DUSE_CUDA=ON -Dcudss_DIR=/usr/local/libcudss-linux-0.3.0.9_cuda12-archive
+    # make -j$(nproc) && make install
+    # cd / && rm -rf /tmp/ceres-solver
+
+    ldconfig
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+%environment
+    export ROS_DISTRO=humble
+    export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+    export LD_LIBRARY_PATH=/opt/ros/humble/lib:$LD_LIBRARY_PATH
+    # If escape hatch 6a was enabled, also export:
+    # export CUDSS_DIR=/usr/local/libcudss-linux-0.3.0.9_cuda12-archive
+    # export CMAKE_PREFIX_PATH=$CUDSS_DIR:$CMAKE_PREFIX_PATH
+    # export LD_LIBRARY_PATH=$CUDSS_DIR/lib:$LD_LIBRARY_PATH
+
+%runscript
+    source /opt/ros/humble/setup.bash
+    exec /bin/bash "$@"
+
+%labels
+    Maintainer shantam
+    Purpose    "Isaac ROS cuVSLAM + nvblox for UAV stack"
+    BaseImage  "nvcr.io/nvidia/tritonserver:24.08-py3"
+    IsaacROS   "release-3.0"

@@ -100,6 +100,32 @@
   gz_type_name:   "gz.msgs.PointCloudPacked"
   direction: GZ_TO_ROS
 
+# ── Stereo IR Pair (D415-equivalent, for cuVSLAM) ───────────
+
+- ros_topic_name: "/drone/stereo/left/image"
+  gz_topic_name:  "/stereo_left_image"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/stereo/left/camera_info"
+  gz_topic_name:  "/stereo_left_image/camera_info"
+  ros_type_name:  "sensor_msgs/msg/CameraInfo"
+  gz_type_name:   "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/stereo/right/image"
+  gz_topic_name:  "/stereo_right_image"
+  ros_type_name:  "sensor_msgs/msg/Image"
+  gz_type_name:   "gz.msgs.Image"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/drone/stereo/right/camera_info"
+  gz_topic_name:  "/stereo_right_image/camera_info"
+  ros_type_name:  "sensor_msgs/msg/CameraInfo"
+  gz_type_name:   "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
 # ── Bottom Depth Camera ─────────────────────────────────────
 
 - ros_topic_name: "/drone/bottom_cam/depth"

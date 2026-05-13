@@ -65,8 +65,8 @@ fi
 # ── 3. Drone models ───────────────────────────────────────────────────────────
 echo ""
 echo "[3/4] Installing drone models (f450, f450_base + meshes)..."
-cp -r "$PX4_FILES/f450"      "$MODELS_DIR/f450"
-cp -r "$PX4_FILES/f450_base" "$MODELS_DIR/f450_base"
+cp -rT "$PX4_FILES/f450"      "$MODELS_DIR/f450"
+cp -rT "$PX4_FILES/f450_base" "$MODELS_DIR/f450_base"
 echo "      Copied → $MODELS_DIR/f450"
 echo "      Copied → $MODELS_DIR/f450_base  (includes meshes/)"
 
