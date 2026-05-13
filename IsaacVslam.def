@@ -61,11 +61,13 @@ From: /scratch/e1553950/singularity/tritonserver_24_08.sif
         libceres-dev
 
     # ── 5. Isaac ROS visual_slam + nvblox ───────────────────────
+    # Note: nvblox sub-packages drop the "isaac-ros-" prefix.
+    # Verified against https://isaac.download.nvidia.com/isaac-ros/release-3
     apt-get install -y --no-install-recommends \
         ros-humble-isaac-ros-visual-slam \
         ros-humble-isaac-ros-visual-slam-interfaces \
         ros-humble-isaac-ros-nvblox \
-        ros-humble-isaac-ros-nvblox-msgs \
+        ros-humble-nvblox-msgs \
         ros-humble-isaac-ros-image-proc
 
     # ── 6. (Escape hatches — leave commented until needed) ──────
