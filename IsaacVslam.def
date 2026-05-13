@@ -19,6 +19,14 @@ Bootstrap: localimage
 # └───────────────────────────────────────────────────────────────┘
 From: /scratch/e1553950/singularity/tritonserver_24_08.sif
 
+%setup
+    # Create mount point dirs required by NUS server bind mounts.
+    # Triton base image has no /app1, /scratch, or /home/svu — without these
+    # mkdirs, Apptainer fails with "destination /app1 doesn't exist in container".
+    mkdir -p ${SINGULARITY_ROOTFS}/app1
+    mkdir -p ${SINGULARITY_ROOTFS}/scratch
+    mkdir -p ${SINGULARITY_ROOTFS}/home/svu
+
 %post
     set -e
     export DEBIAN_FRONTEND=noninteractive
