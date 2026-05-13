@@ -51,14 +51,23 @@ From: /scratch/e1553950/singularity/tritonserver_24_08.sif
     echo "deb [signed-by=/usr/share/keyrings/isaac-ros-archive-keyring.gpg] https://isaac.download.nvidia.com/isaac-ros/release-3 $(lsb_release -cs) release-3.0" \
         > /etc/apt/sources.list.d/isaac-ros.list
 
+    # ── 3b. NVIDIA L4T (Jetson) apt repo — provides VPI (libnvvpi3) ──
+    # cuVSLAM dlopen's libnvvpi.so.3 at runtime; VPI ships from this repo
+    # even on x86_64 (legacy naming, multi-platform builds).
+    curl -fsSL https://repo.download.nvidia.com/jetson/jetson-ota-public.asc \
+        | gpg --dearmor -o /usr/share/keyrings/nvidia-l4t-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/nvidia-l4t-archive-keyring.gpg] http://repo.download.nvidia.com/jetson/x86_64/$(lsb_release -cs) r36.4 main" \
+        > /etc/apt/sources.list.d/nvidia-l4t.list
+
     apt-get update
 
-    # ── 4. ROS 2 Humble base ────────────────────────────────────
+    # ── 4. ROS 2 Humble base + VPI runtime ──────────────────────
     apt-get install -y --no-install-recommends \
         ros-humble-ros-base \
         python3-colcon-common-extensions \
         python3-rosdep \
-        libceres-dev
+        libceres-dev \
+        libnvvpi3
 
     # ── 5. Isaac ROS visual_slam + nvblox ───────────────────────
     # Note: nvblox sub-packages drop the "isaac-ros-" prefix.
