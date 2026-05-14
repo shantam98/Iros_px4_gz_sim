@@ -31,11 +31,17 @@ missing=0
 
 mkdir -p "$LOG_DIR"
 
+# Per-user /tmp inside the container — avoids /tmp/px4_lock-<N> collisions
+# when multiple users share the same host /tmp (NUS cluster default).
+TMP_DIR="${TMP_DIR:-$BASE/tmp}"
+mkdir -p "$TMP_DIR"
+
 echo "========================================"
 echo " UAV Stack — NUS Server"
 echo " SIF      : $SIF"
 echo " PX4      : $PX4_DIR"
 echo " Logs     : $LOG_DIR"
+echo " Tmp (in container) : $TMP_DIR → /tmp"
 echo "========================================"
 
 # ── Shared strings ────────────────────────────────────────────────────────────
@@ -44,7 +50,7 @@ SRC="source /opt/ros/humble/setup.bash \
   && source $PX4_ROS_WS/install/setup.bash \
   && source $PLANNER_WS/install/setup.bash"
 
-APT="singularity exec --nv $SIF"
+APT="singularity exec --nv -B $TMP_DIR:/tmp $SIF"
 
 # ── T1: PX4 SITL + Gazebo ─────────────────────────────────────────────────────
 echo "[T1] Launching PX4 + Gazebo..."
