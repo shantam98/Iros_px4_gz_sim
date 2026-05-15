@@ -79,10 +79,15 @@ echo "     Waiting 5 s for bridge to come up..."
 sleep 5
 
 # ── T4: UAV Bringup (planner stack) ──────────────────────────────────────────
-echo "[T4] Launching UAV Bringup..."
+# WITH_VSLAM=true gates the static map→odom and skips OctoMap (cuVSLAM/nvblox
+# take over). Operator must launch vslam.launch.py separately — see
+# run_sitl_slam.sh.
+WITH_VSLAM="${WITH_VSLAM:-false}"
+echo "[T4] Launching UAV Bringup (with_vslam=$WITH_VSLAM)..."
 xterm -title "T4: UAV Bringup" -e bash -c \
   "$APT bash -c '$SRC && ros2 launch uav_bringup full_stack.launch.py \
     with_global_planner:=false \
+    with_vslam:=$WITH_VSLAM \
     2>&1 | tee $LOG_DIR/planner.log'; exec bash" &
 
 # ── T5: Interactive shell (waypoint / bag commands) ──────────────────────────
