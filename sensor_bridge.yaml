@@ -11,6 +11,19 @@
 #       in the SDF, but bridge topics are unchanged.
 # ============================================================
 
+# ── Simulation clock ───────────────────────────────────────
+# Bridges Gazebo's /clock to the ROS side. Required for all nodes
+# running with use_sim_time:=true (cuVSLAM, nvblox, planner stack).
+# Without this, sim-time-aware nodes either stall waiting for /clock
+# or fall back to wall-clock-stamped TF data — causing the
+# "TF_OLD_DATA ... Authority undetectable" warnings.
+
+- ros_topic_name: "/clock"
+  gz_topic_name:  "/clock"
+  ros_type_name:  "rosgraph_msgs/msg/Clock"
+  gz_type_name:   "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
 # ── ToF Array (all 5 sensors share tof_array_link frame) ───
 # depth image topics (32FC1 float — use Normalize Range in RViz2)
 
