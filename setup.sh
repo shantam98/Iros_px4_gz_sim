@@ -70,11 +70,14 @@ cp -rT "$PX4_FILES/f450_base" "$MODELS_DIR/f450_base"
 echo "      Copied → $MODELS_DIR/f450"
 echo "      Copied → $MODELS_DIR/f450_base  (includes meshes/)"
 
-# ── 4. World file ─────────────────────────────────────────────────────────────
+# ── 4. World files ────────────────────────────────────────────────────────────
 echo ""
-echo "[4/4] Installing world file..."
-cp "$PX4_FILES/indoor_obstacle.sdf" "$WORLDS_DIR/indoor_obstacle.sdf"
-echo "      Copied → $WORLDS_DIR/indoor_obstacle.sdf"
+echo "[4/4] Installing world files (default + ablation scenarios)..."
+for world in "$PX4_FILES"/*.sdf; do
+  base=$(basename "$world")
+  cp "$world" "$WORLDS_DIR/$base"
+  echo "      Copied → $WORLDS_DIR/$base"
+done
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 echo ""

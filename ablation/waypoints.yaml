@@ -1,0 +1,27 @@
+# Per-scenario goal pose (frame: map) + run timeout.
+# Drone always spawns at (0, 0, 0) facing +X in ENU.
+# Success = drone within 0.5 m of goal in XY before timeout.
+
+scenario_1_pole:
+  x: 6.0
+  y: 0.0
+  z: 1.5
+  timeout_s: 30
+
+scenario_2_slalom:
+  x: 7.0
+  y: 0.0
+  z: 1.5
+  timeout_s: 40
+
+scenario_3_corner:
+  x: 4.0
+  y: 4.0
+  z: 1.5
+  timeout_s: 50
+
+scenario_4_gap:
+  x: 7.0
+  y: 0.0
+  z: 1.5
+  timeout_s: 40

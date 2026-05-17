@@ -137,6 +137,165 @@
          5x ToF SENSORS (A010, 72° ring)
     ══════════════════════════════════════════ -->
 
+    <!-- <link name="tof_0_link">
+
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_0_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <pose>0.25 0 0 0 0 0</pose>
+      <sensor name="tof_0" type="depth_camera">
+        <gz_frame_id>tof_0_link</gz_frame_id>
+        <always_on>1</always_on><visualize>true</visualize><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.15</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_0_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_0_joint" type="fixed">
+      <parent>base_link</parent><child>tof_0_link</child>
+    </joint>
+
+    <link name="tof_1_link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_1_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+      <pose>0.077 0.236 0 0 0 1.2566</pose>
+      <sensor name="tof_1" type="depth_camera">
+        <gz_frame_id>tof_1_link</gz_frame_id>
+        <always_on>1</always_on><visualize>true</visualize><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+          </camera>
+          <topic>tof_1_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_1_joint" type="fixed">
+      <parent>base_link</parent><child>tof_1_link</child>
+    </joint>
+
+    <link name="tof_2_link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_2_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+      <pose>-0.202 0.147 0 0 0 2.5133</pose>
+      <sensor name="tof_2" type="depth_camera">
+        <gz_frame_id>tof_2_link</gz_frame_id>
+        <always_on>1</always_on><visualize>true</visualize><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.15</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_2_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_2_joint" type="fixed">
+      <parent>base_link</parent><child>tof_2_link</child>
+    </joint>
+
+    <link name="tof_3_link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_3_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <pose>-0.202 -0.147 0 0 0 -2.5133</pose>
+      <sensor name="tof_3" type="depth_camera">
+        <gz_frame_id>tof_3_link</gz_frame_id>
+        <always_on>1</always_on><visualize>true</visualize><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.15</near><far>3.0</far></clip>
+        </camera>
+        <topic>tof_3_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_3_joint" type="fixed">
+      <parent>base_link</parent><child>tof_3_link</child>
+    </joint>
+
+    <link name="tof_4_link">
+      <inertial>
+        <mass>0.001</mass>
+        <inertia><ixx>1e-6</ixx><ixy>0</ixy><ixz>0</ixz><iyy>1e-6</iyy><iyz>0</iyz><izz>1e-6</izz></inertia>
+      </inertial>
+      <self_collide>false</self_collide>
+      <gravity>false</gravity>
+      <collision name="tof_4_link/collision">
+        <pose>0.00358 -0.03 .014 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0175 0.091 0.028</size>
+          </box>
+        </geometry>
+      </collision>
+      <pose>0.077 -0.236 0 0 0 -1.2566</pose>
+      <sensor name="tof_4" type="depth_camera">
+        <gz_frame_id>tof_4_link</gz_frame_id>
+        <always_on>1</always_on><update_rate>20</update_rate>
+        <camera>
+          <horizontal_fov>1.2217</horizontal_fov>
+          <image><width>100</width><height>100</height><format>R_FLOAT32</format></image>
+          <clip><near>0.2</near><far>3.0</far></clip>
+        </camera>
+        <visualize>true</visualize>
+        <topic>tof_4_depth</topic>
+      </sensor>
+    </link>
+    <joint name="tof_4_joint" type="fixed">
+      <parent>base_link</parent><child>tof_4_link</child>
+    </joint> -->
+
     <!-- Single shared ToF link, centered at drone origin -->
     <link name="tof_array_link">
       <inertial>
@@ -338,7 +497,7 @@
 
     <!-- ══════════════════════════════════════════
          STEREO IR PAIR (mirrors Intel RealSense D415)
-         HFOV 65° (1.134 rad), 640×480 mono, 30 Hz,
+         HFOV 65° (1.134 rad), 1280×720 mono, 30 Hz,
          baseline 55 mm (cameras at ±0.0275 m)
     ══════════════════════════════════════════ -->
     <link name="stereo_left_cam_link">
@@ -354,7 +513,7 @@
         <always_on>1</always_on><update_rate>30</update_rate>
         <camera>
           <horizontal_fov>1.134</horizontal_fov>
-          <image><width>640</width><height>480</height><format>L8</format></image>
+          <image><width>1280</width><height>720</height><format>L8</format></image>
           <clip><near>0.1</near><far>10.0</far></clip>
           <noise><type>gaussian</type><mean>0</mean><stddev>0.005</stddev></noise>
         </camera>
@@ -379,7 +538,7 @@
         <always_on>1</always_on><update_rate>30</update_rate>
         <camera>
           <horizontal_fov>1.134</horizontal_fov>
-          <image><width>640</width><height>480</height><format>L8</format></image>
+          <image><width>1280</width><height>720</height><format>L8</format></image>
           <clip><near>0.1</near><far>10.0</far></clip>
           <noise><type>gaussian</type><mean>0</mean><stddev>0.005</stddev></noise>
         </camera>
