@@ -3,10 +3,10 @@
 # Success = drone within 0.5 m of goal in XY before timeout.
 
 scenario_1_pole:
-  x: 6.0
-  y: 0.0
+  x: 8.0       # 4 m past the pole at (4, 0); forces the drone to actually
+  y: 0.0       # round it and continue straight, not just brake near it.
   z: 1.5
-  timeout_s: 30
+  timeout_s: 40
 
 scenario_2_slalom:
   x: 7.0

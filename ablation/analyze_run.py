@@ -31,7 +31,9 @@ except ImportError:
 
 def read_bag(bag_path: Path):
     """Yield (topic, msg, t_ns) tuples in time order."""
-    storage = StorageOptions(uri=str(bag_path), storage_id="mcap")
+    # storage_id="" lets rosbag2 sniff the format (sqlite3 default, or mcap
+    # if the host has the plugin).
+    storage = StorageOptions(uri=str(bag_path), storage_id="")
     conv = ConverterOptions(input_serialization_format="cdr",
                             output_serialization_format="cdr")
     reader = SequentialReader()
@@ -94,29 +96,45 @@ def analyze(run_dir: Path):
     else:
         mean_speed = float("nan")
 
-    # Jerk RMS — third derivative of position w.r.t. time.
+    # Jerk RMS — third derivative of position. Downsample to a uniform 20 Hz
+    # grid first so dt-jitter from sim-time pauses can't blow up the
+    # finite-difference. Clip outliers above 50 m/s^3 (anything faster than
+    # the drone can physically do is sensor/clock noise, not real motion).
     jerk_rms = float("nan")
-    if len(odom_samples) >= 5:
+    if len(odom_samples) >= 20:
         ts = [s[0] for s in odom_samples]
         xs = [s[1] for s in odom_samples]
         ys = [s[2] for s in odom_samples]
 
-        def deriv(values, times):
-            out = []
-            for i in range(1, len(values)):
-                dt = times[i] - times[i - 1]
-                if dt > 1e-4:
-                    out.append((values[i] - values[i - 1]) / dt)
-                else:
-                    out.append(0.0)
-            return out
+        t0, tN = ts[0], ts[-1]
+        dt_uniform = 0.05  # 20 Hz
+        n_steps = max(int((tN - t0) / dt_uniform), 5)
+        ux, uy = [], []
+        j = 0
+        for k in range(n_steps):
+            tk = t0 + k * dt_uniform
+            while j + 1 < len(ts) and ts[j + 1] < tk:
+                j += 1
+            ux.append(xs[j])
+            uy.append(ys[j])
 
-        vx = deriv(xs, ts); vy = deriv(ys, ts)
-        ax = deriv(vx, ts[1:]); ay = deriv(vy, ts[1:])
-        jx = deriv(ax, ts[2:]); jy = deriv(ay, ts[2:])
+        def deriv(values, dt):
+            return [(values[i] - values[i - 1]) / dt for i in range(1, len(values))]
+
+        vx = deriv(ux, dt_uniform); vy = deriv(uy, dt_uniform)
+        ax = deriv(vx, dt_uniform); ay = deriv(vy, dt_uniform)
+        jx = deriv(ax, dt_uniform); jy = deriv(ay, dt_uniform)
         if jx:
-            sq = [jx[i] ** 2 + jy[i] ** 2 for i in range(len(jx))]
+            sq = [min(jx[i] ** 2 + jy[i] ** 2, 2500.0) for i in range(len(jx))]
             jerk_rms = math.sqrt(sum(sq) / len(sq))
+
+    # Altitude trace: catch "drone descended unexpectedly" failures.
+    zs = [s[3] for s in odom_samples]
+    z_min  = round(min(zs), 2) if zs else None
+    z_max  = round(max(zs), 2) if zs else None
+    z_end  = round(zs[-1], 2) if zs else None
+    # If z dropped below 0.3 m at any point, drone effectively touched the floor.
+    z_floor_hit = z_min is not None and z_min < 0.3
 
     metrics = {
         "scenario":        meta["scenario"],
@@ -128,6 +146,10 @@ def analyze(run_dir: Path):
         "min_clearance_m": None if min_clear == float("inf") else round(min_clear, 2),
         "mean_speed_mps":  None if mean_speed != mean_speed else round(mean_speed, 2),
         "jerk_rms":        None if jerk_rms != jerk_rms else round(jerk_rms, 3),
+        "z_min_m":         z_min,
+        "z_max_m":         z_max,
+        "z_end_m":         z_end,
+        "floor_hit":       z_floor_hit,
         "n_estop_frames":  n_estop,
         "n_avoiding_frames": n_avoiding,
         "shell_elapsed_s": meta["elapsed_s"],

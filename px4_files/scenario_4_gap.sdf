@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sdf version="1.9">
-  <world name="indoor_obstacle">
+  <world name="scenario_4_gap">
 
     <!-- ── Physics (matching walls.sdf) ── -->
     <physics type="ode">

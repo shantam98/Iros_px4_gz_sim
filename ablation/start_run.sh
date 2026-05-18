@@ -40,8 +40,8 @@ PY
 
 # ── Output dir ──────────────────────────────────────────────────────────────
 bag_root="${ABLATION_BAGS:-$HOME/irobot/planner_ws/bags}"
-mkdir -p "$bag_root"
 run_dir="$bag_root/${scenario}__${sensor}__seed${seed}__$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$run_dir"
 echo "================================================================"
 echo " ABLATION RUN"
 echo "  scenario     : $scenario"
@@ -55,15 +55,22 @@ echo "================================================================"
 # ── Confirm planner is alive ────────────────────────────────────────────────
 status=$(timeout 3 ros2 topic echo /uav/vfh_status --once 2>/dev/null \
          | awk -F'data: ' '/data:/ {print $2; exit}' || true)
-if [[ "$status" != "NOMINAL" ]]; then
-    echo "WARN: /uav/vfh_status='${status:-<no message>}'."
-    echo "      Expected NOMINAL. Make sure T1 + T4 are up and the drone has"
-    echo "      reached HOVER. Continuing anyway in 3s..."
-    sleep 3
-fi
+# IDLE = planner is up but no waypoint yet (expected pre-run state).
+# NOMINAL = planner is up and actively tracking a waypoint.
+# Anything else = something's wrong.
+case "${status:-}" in
+    NOMINAL|IDLE)
+        ;;
+    *)
+        echo "WARN: /uav/vfh_status='${status:-<no message>}'."
+        echo "      Expected NOMINAL or IDLE. Make sure T1 + T4 are up and"
+        echo "      the drone has reached HOVER. Continuing anyway in 3s..."
+        sleep 3
+        ;;
+esac
 
 # ── Start bag recorder in background ────────────────────────────────────────
-ros2 bag record -o "$run_dir/bag" -s mcap \
+ros2 bag record -o "$run_dir/bag" \
     /drone/odom \
     /uav/cmd_vel \
     /uav/mp_diag \
@@ -76,11 +83,41 @@ ros2 bag record -o "$run_dir/bag" -s mcap \
 bag_pid=$!
 sleep 2   # let bag set up subscribers
 
-# ── Send waypoint ───────────────────────────────────────────────────────────
-echo "[$(date +%H:%M:%S)] sending waypoint..."
-ros2 topic pub --once /uav/current_waypoint geometry_msgs/msg/PointStamped \
-    "{header: {frame_id: map}, point: {x: $wp_x, y: $wp_y, z: $wp_z}}" \
-    > /dev/null
+# ── Send waypoint via Python (avoids 'ros2 topic pub --once' discovery race) ─
+echo "[$(date +%H:%M:%S)] sending waypoint to ($wp_x, $wp_y, $wp_z)..."
+python3 - "$wp_x" "$wp_y" "$wp_z" <<'PY'
+import sys, time
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import PointStamped
+
+wx, wy, wz = map(float, sys.argv[1:4])
+rclpy.init()
+n = Node('ablation_wp_pub')
+pub = n.create_publisher(PointStamped, '/uav/current_waypoint', 10)
+
+# Wait until at least one subscriber (mp_node) is connected.
+for _ in range(50):
+    if pub.get_subscription_count() > 0:
+        break
+    rclpy.spin_once(n, timeout_sec=0.1)
+
+m = PointStamped()
+m.header.frame_id = 'map'
+m.point.x, m.point.y, m.point.z = wx, wy, wz
+
+# Publish a few times so even latched/late subscribers catch it.
+for _ in range(10):
+    m.header.stamp = n.get_clock().now().to_msg()
+    pub.publish(m)
+    rclpy.spin_once(n, timeout_sec=0.05)
+    time.sleep(0.05)
+
+subs = pub.get_subscription_count()
+print(f"waypoint published to {subs} subscriber(s).")
+n.destroy_node()
+rclpy.shutdown()
+PY
 
 # ── Wait for goal-reached or timeout ────────────────────────────────────────
 t0=$(date +%s)

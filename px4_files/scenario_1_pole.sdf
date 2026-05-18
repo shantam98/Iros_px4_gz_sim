@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sdf version="1.9">
-  <world name="indoor_obstacle">
+  <world name="scenario_1_pole">
 
     <!-- ── Physics (matching walls.sdf) ── -->
     <physics type="ode">
@@ -185,14 +185,17 @@
 
 
     <!-- ───────────────────────────────────────────────────────────────────
-         SCENARIO 1 — Single pole 4 m forward of spawn.
-         Spawn: (0, 0, 0) facing +X. Waypoint: (6, 0, 1.5).
-         Tests forward obstacle detection range. D415 expected to win on
-         time-to-goal (sees pole sooner via longer range).
+         SCENARIO 1 — Pole 4 m forward, offset 0.5 m to the left of spawn axis.
+         Head-on placement at (4, 0) was geometrically un-avoidable for
+         mp_node (max lateral curve per cycle ≈ 0.78 m < required clearance
+         0.87 m = collision_radius 0.75 + pole_radius 0.12), causing
+         unconditional ESTOP-pin. Offsetting to (4, 0.5) lets the
+         goal-aligned arc clear the pole and tests curving response.
+         Spawn: (0, 0, 0) facing +X. Waypoint: (8, 0, 1.5).
     ─────────────────────────────────────────────────────────────────── -->
     <model name="pole">
       <static>true</static>
-      <pose>4 0 1.5 0 0 0</pose>
+      <pose>4 0.5 1.5 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <geometry><cylinder><radius>0.12</radius><length>3.0</length></cylinder></geometry>
