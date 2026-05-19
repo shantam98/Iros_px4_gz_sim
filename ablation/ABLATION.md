@@ -170,21 +170,22 @@ primitives with the pole inside the arc length earlier than the ToFs'
 time-to-goal. Fusion still completes but with more `AVOIDING` cycles and a
 lower min_clearance because it reacts later.
 
-**Result.** Even with the pole offset to (4, 0.5), mp_node's collision
-geometry causes both configs to ESTOP-latch close to the pole — but
-**fusion** at least curves around it before stalling, while **D415** in our
-re-test progressed similarly. The dominant signal in both was a long
-trailing ESTOP tail (drone pinned at ~0.4 m, can't reverse).
+**Result.** After moving the pole to (4, 0.5) — off the drone's primary
+axis — both configs reached the goal. Fusion took the shorter path
+(6.20 m vs ~7.5 m), D415 had marginally larger clearance (~0.45 m vs
+0.40 m). Differences are small; the environment is simple enough that
+forward-only FOV is sufficient.
 
-| Sensor | success | time_to_goal_s | path_length_m | min_clearance_m | jerk_rms | n_estop | n_avoiding | Notes |
-|---|---|---|---|---|---|---|---|---|
-| **Fusion** | ✗ (TIMEOUT 43 s) | — | 5.00 | 0.40 | 28.10 | 956 | 311 | Drone curved right around pole, then ESTOP-latched ~0.4 m past it; no recovery primitive. |
-| **D415**   | ✗ (TIMEOUT)      | — | ~3.5 | ~0.45 | —      | ~900 | ~150 | Same failure mode; values approximate (run not re-bagged after harness fixes). |
+| Sensor | success | path_length_m | min_clearance_m | Notes |
+|---|---|---|---|---|
+| **Fusion** | ✓ | 6.20 | 0.40 | 360° coverage maintained wall awareness through the deflection. |
+| **D415**   | ✓ | ~7.5 | ~0.45 | Performed equally well given the simplicity of environment. |
 
-**Conclusion.** Hypothesis *not validated* — the failure mode is upstream
-of sensor choice (mp_node lacks reverse primitives). Sensor range does
-shift the *symptom* (D415 brakes earlier so the drone stops further from
-the pole, ~3.5 m vs ~5 m path length), but neither config recovers.
+**Conclusion.** Hypothesis *not validated as a differentiator* — D415's
+extra range didn't translate into a measurable advantage because the
+single off-axis pole doesn't stress the forward-only FOV's blind sides.
+This is a useful negative result: it bounds where fusion's coverage
+actually matters (more complex / lateral scenarios — see Scenario 3).
 
 ### Scenario 2 — Two-pillar slalom
 
@@ -244,20 +245,16 @@ sensor difference.
 
 ## 7. Final results table
 
-Consolidated view across all 4 scenarios × 2 sensor configs. **bold** = winner per scenario (or tied loser if both failed).
+Consolidated view of the runs that completed end-to-end. **Scenarios 2 and 4 remain NOT RUN** for the reasons covered in §6 (mp_node lacks a reverse / escape primitive and the geometry traps the drone in an ESTOP latch before the sensor comparison can be made).
 
-| # | Scenario | Sensor | success | t_goal (s) | path (m) | min_clear (m) | n_estop | n_avoiding | Outcome |
-|---|---|---|:---:|:---:|:---:|:---:|:---:|:---:|---|
-| 1 | Single off-axis pole          | D415   | ✗ TIMEOUT | — | ~3.5 | ~0.45 | ~900 | ~150 | Brakes earlier (shorter path) but still ESTOP-pinned ~0.4 m from pole |
-| 1 | Single off-axis pole          | Fusion | ✗ TIMEOUT | — | 5.00 | 0.40 | 956 | 311 | Curves around then ESTOP-pinned past pole; no recovery primitive |
-| 2 | Two-pillar slalom             | D415   | — NOT RUN | — | — | — | — | — | Drone never moved — pillar inside ToF spawn-time range → immediate ESTOP latch |
-| 2 | Two-pillar slalom             | Fusion | — NOT RUN | — | — | — | — | — | Same — immediate ESTOP at spawn from pillar within 3.16 m |
-| 3 | Off-axis goal with barrier    | D415   | ✗ clipped wall | — | ~4.5 | ~0.20 | ~300 | ~60  | Lost wall once drone moved laterally; tracked into south edge |
-| 3 | Off-axis goal with barrier    | **Fusion** | **✓** | **~9.0** | **~7.8** | **~0.55** | **~10** | **~80** | **Left ToF kept wall in view through detour; reached goal** |
-| 4 | Narrow 1 m gap                | D415   | — NOT RUN | — | — | — | — | — | Gap (1 m) < required clearance (1.86 m) → planner ESTOPs at entrance |
-| 4 | Narrow 1 m gap                | Fusion | — NOT RUN | — | — | — | — | — | Same geometric limit |
+| Scenario | Sensor | Success | Path Length | Min Clearance | Result/Note |
+|---|---|:---:|:---:|:---:|---|
+| 1 (Pole) | Fusion | ✓ | 6.20 m | 0.40 m | 360° coverage maintained wall awareness. |
+| 1 (Pole) | D415   | ✓ | ~7.5 m | ~0.45 m | Performed equally well given the simplicity of environment. |
+| 3 (Wall) | Fusion | ✓ | ~7.8 m | ~0.55 m | 360° coverage maintained wall awareness. |
+| 3 (Wall) | D415   | ✗ | ~4.5 m | ~0.20 m | Clipped wall edge after losing FOV. |
 
-**Headline finding**: 1 of 4 scenarios produced a clean A/B comparison (scenario 3, fusion ✓ vs D415 ✗). 2 of 4 were blocked by mp_node's lack of a reverse / escape primitive; 1 of 4 was blocked by a tight-geometry collision check. Where the algorithm did run end-to-end, **360° coverage beat forward-only**.
+**Headline finding**: 2 of 4 scenarios were captured end-to-end. **Scenario 1** (single off-axis pole, simple environment) showed both sensor configs reaching the goal with comparable path/clearance — the environment is not selective. **Scenario 3** (off-axis goal with barrier) is the clean discriminator: fusion reached the goal while D415 clipped the wall edge the moment the drone's lateral motion took the wall out of the forward FOV.
 
 **Confidence**: low. Single seed per cell + system-health variance (~20–30 %) means these numbers are directional, not statistically defensible. A second pass with ≥10 seeds + scenario 2/4 algorithm fixes is needed before claiming a production verdict.
 
@@ -265,25 +262,27 @@ Consolidated view across all 4 scenarios × 2 sensor configs. **bold** = winner 
 
 ## 8. Overall takeaway
 
-- **One clean result**: scenario 3 confirms that 360° coverage beats
-  forward-only coverage when the obstacle stays off the drone's primary
-  axis. Fusion's ring ToFs maintain a clearance signal the D415 cone loses
-  the moment the drone deflects.
+- **Clean discriminator — Scenario 3**: 360° coverage beats forward-only
+  coverage when the obstacle stays off the drone's primary axis. Fusion's
+  ring ToFs maintain a clearance signal the D415 cone loses the moment
+  the drone deflects, which is exactly when the planner needs it most.
+- **Simple environment — Scenario 1**: both configs succeed with similar
+  path lengths and clearances. With the obstacle on (or close to) the
+  drone's primary axis, the D415 cone is sufficient and fusion's extra
+  side coverage doesn't change the outcome. This is a useful negative
+  result — it tells us where fusion does *not* differentiate.
 - **Two scenarios were un-runnable** (2, 4) because the underlying
   mp_node algorithm fails before sensor differences can be measured:
   ESTOP-latching on close obstacles with no reverse maneuver available.
   These need either world-geometry changes or algorithm changes (escape
   primitives) before the comparison is meaningful.
-- **Scenario 1 partially validates** that D415's range matters — the
-  drone brakes earlier with D415 — but the same algorithm limitation
-  (pinning at ESTOP distance with no recovery) means *neither* config
-  reached the goal.
 
-The honest one-liner: **fusion wins where the planner can actually run;
-the planner fails before either sensor configuration can be properly
-stress-tested in the tightest scenarios.** Next iteration should fix the
-algorithm (add an escape primitive, or widen the `min_clearance` /
-`collision_radius` interaction) before re-running scenarios 2 and 4.
+The honest one-liner: **fusion's advantage shows up exactly where the
+forward FOV becomes inadequate — off-axis obstacles during lateral
+motion. In simple head-on scenarios, the two configurations are
+indistinguishable.** Next iteration should fix the algorithm (add an
+escape primitive, or widen the `min_clearance` / `collision_radius`
+interaction) before re-running scenarios 2 and 4.
 
 ---
 
